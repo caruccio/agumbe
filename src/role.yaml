@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: global-secret-crd
-  namespace: slokanath
+  namespace: global-secrets
 rules:
 - apiGroups:
   - savilabs.io
