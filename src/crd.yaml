@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: globalsecrets.savilabs.io
-  namespace: slokanath
+  namespace: global-secrets
 spec:
   scope: Namespaced
   group: savilabs.io
@@ -19,6 +19,9 @@ spec:
       properties:
         spec:
           properties:
+            namespace:
+              type: string
+              description: "Namespace where the secret is stored"
             secretName:
               type: string
               description: "Name of the secret to replicate into namespaces"
