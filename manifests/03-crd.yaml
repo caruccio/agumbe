@@ -19,14 +19,11 @@ spec:
       priority: 0
       JSONPath: .spec.secretName
       description: Name of the secret to replicate into namespace
-    - name: Target SecretName
+    - name: Target Secret Name
       type: string
+      priority: 0
       JSONPath: .spec.targetSecretName
-      description: Name of the secret to be replicated
-    - name: Target Namespace
-      type: array
-      JSONPATH: .spec.targetNamespaces
-      description: List of namespaces to which the secret has to be replicated
+      description: Name of the replicated secret in the target namespace
   validation:
     openAPIV3Schema:
       properties:
@@ -35,12 +32,9 @@ spec:
             secretName:
               type: string
               description: "Name of the secret to replicate into namespaces"
-              required: true
             targetSecretName:
               type: string
               description: "Nane of the secret to be replicated"
-              required: true
             targetNamespaces:
               type: array
               description: "List of namespaces to which the secret has to be replicated"
-              required: true
