@@ -38,3 +38,4 @@ spec:
             targetNamespaces:
               type: array
               description: "List of namespaces to which the secret has to be replicated"
+          required: ["secretName", "targetNamespaces"]
