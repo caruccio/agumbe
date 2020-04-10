@@ -34,7 +34,7 @@ spec:
               description: "Name of the secret to replicate into namespaces"
             targetSecretName:
               type: string
-              description: "Nane of the secret to be replicated"
+              description: "Name of the secret to be replicated"
             targetNamespaces:
               type: array
               description: "List of namespaces to which the secret has to be replicated"
