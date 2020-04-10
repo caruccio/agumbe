@@ -14,6 +14,9 @@ rules:
 - apiGroups: [""]
   resources: ["secrets"]
   verbs: ["get", "create", "update", "list"]
+- apiGroups: ["savilabs.io"]
+  resources: ["globalsecrets"]
+  verbs: ["get", "list", "watch"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
