@@ -34,7 +34,7 @@ def getSecret(apiCore, apiApi, namespace, spec):
   except Exception as e:
     raise kopf.HandlerFatalError(f'Failed to fetch secret {secret}')
 
-
+@kopf.on.resume('savilabs.io', 'v1alpha1', 'globalsecrets')
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalsecrets')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalsecrets')
 def createUpdate(event, body, spec, name, namespace, logger, **kwargs):
