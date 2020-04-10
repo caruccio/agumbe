@@ -1,0 +1,19 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agumbe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      operator: agumbe
+  template:
+    metadata:
+      labels:
+        operator: agumbe
+    spec:
+      serviceAccountName: secrets-operator
+      containers:
+      - name: agumbe
+        image: savvythru/agumbe
