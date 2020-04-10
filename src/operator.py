@@ -3,20 +3,22 @@ from kubernetes import client
 
 def validate(spec):
 
-  if not spec['secretName']:
-    raise kopf.HandlerFatalError(f"Secret Name is a required value (type: String)")
+  if not spec.get('secretName'):
+    raise kopf.PermanentError(f"Secret Name is a required value (type: String)")
 
-  if not spec['targetNamespaces']:
-    raise kopf.HandlerFatalError(f"Target Namespace is a required value (type: List)")
+  if not spec.get('targetNamespaces'):
+    raise kopf.PermanentError(f"Target Namespace is a required value (type: List)")
 
   secret = spec['secretName']
   targetNamespaces = spec['targetNamespaces']
-  targetSecretName = spec['secretName']
 
-  if spec['targetSecretName']:
+  if spec.get('targetSecretName'):
     targetSecretName = spec['targetSecretName']
+  else:
+    targetSecretName = spec['secretName']
 
   return secret, targetNamespaces, targetSecretName
+
 
 def getSecret(apiCore, apiApi, namespace, spec):
 
@@ -53,7 +55,11 @@ def createUpdate(event, body, spec, name, namespace, logger, **kwargs):
         createObj = apiCore.create_namespaced_secret(namespace=targetNamespace, body=getObj)
 
       elif oper == "update":
-        createObj = apiCore.replace_namespaced_secret(name=targetSecretName, namespace=targetNamespace, body=getObj)
+        try:
+          createObj = apiCore.replace_namespaced_secret(name=targetSecretName, namespace=targetNamespace, body=getObj)
+        except Exception as e:
+          createObj = apiCore.create_namespaced_secret(namespace=targetNamespace, body=getObj)
+
       logger.info(f'{oper.upper()}: Secret {namespace}/{secretName} duped to {targetNamespace}/{createObj.metadata.name}')
 
     except Exception as e:
