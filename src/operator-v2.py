@@ -1,15 +1,15 @@
 import kopf
 from kubernetes import client
 
+@kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobject')
+@kopf.on.create('einstein.ai', 'v1alpha1', 'globalobject')
+@kopf.on.update('einstein.ai', 'v1alpha1', 'globalobject')
 class Agumbe(object):
 
   """
   API to duplicate objects
   """
 
-  @kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobject')
-  @kopf.on.create('einstein.ai', 'v1alpha1', 'globalobject')
-  @kopf.on.update('einstein.ai', 'v1alpha1', 'globalobject')
   def __init__(self, event, body, spec, name, namespace, logger, **kwargs):
     self.apiCore = client.CoreV1Api()
     self.apiApi = client.ApiClient()
