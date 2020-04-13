@@ -9,19 +9,20 @@ class Agumbe(object):
     API to duplicate objects
     """
 
-    def __init__(self, event, body, spec, name, namespace, logger, **kwargs):
+    def __init__(self, **kwargs):
+        
         self.apiCore = client.CoreV1Api()
         self.apiApi = client.ApiClient()
 
-        self.event = event
-        self.logger = logger
+        self.event = kwargs['event']
+        self.logger = kwargs['logger']
 
-        self.globalObjectName = name
-        self.srcNamespace = namespace
-        self.srcObjType = spec['type']
-        self.srcObjName = spec['name']
-        self.destObjName = spec['targetName'] if spec.get('targetName') else spec['name']
-        self.destNamespaces = spec['targetNamespaces']
+        self.globalObjectName = kwargs['name']
+        self.srcNamespace = kwargs['namespace']
+        self.srcObjType = kwargs['spec']['type']
+        self.srcObjName = kwargs['spec']['name']
+        self.destObjName = kwargs['spec']['targetName'] if kwargs['spec'].get('targetName') else kwargs['spec']['name']
+        self.destNamespaces = kwargs['spec']['targetNamespaces']
 
     def secret(self):
 
@@ -135,5 +136,6 @@ class Agumbe(object):
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, body, spec, name, namespace, logger, **kwargs):
+    
     go = Agumbe(event, body, spec, name, namespace, logger)
     go.processObject()
