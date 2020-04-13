@@ -31,6 +31,7 @@ class Agumbe(object):
         readSourceObj = self.apiCore.read_namespaced_secret(name=self.srcObjName, namespace=self.srcNamespace,
                                                             export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
+        jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
             try:
@@ -69,6 +70,7 @@ class Agumbe(object):
         readSourceObj = self.apiCore.read_namespaced_config_map(name=self.srcObjName, namespace=self.srcNamespace,
                                                                 export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
+        jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
             try:
@@ -96,7 +98,7 @@ class Agumbe(object):
             except Exception as e:
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
-                    f'into {self.destNamespace}')
+                    f'into {self.destNamespaces}')
 
     def processObject(self):
         
