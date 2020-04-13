@@ -2,20 +2,20 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: secrets-operator
+  name: agumbe
   namespace: admin
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: secrets-operator
+  name: agumbe
 rules:
 - apiGroups: [""]
-  resources: ["secrets"]
+  resources: ["secrets", "configmaps"]
   verbs: ["get", "create", "update", "list"]
 - apiGroups: ["savilabs.io"]
-  resources: ["globalsecrets"]
+  resources: ["globalobjects"]
   verbs: ["get", "list", "watch", "put", "post", "patch"]
 - apiGroups: ["events.k8s.io", ""]
   resources: ["events"]
@@ -25,12 +25,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: secrets-operator
+  name: agumbe
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: secrets-operator
+  name: agumbe
 subjects:
   - kind: ServiceAccount
-    name: secrets-operator
+    name: agumbe
     namespace: admin
+    
