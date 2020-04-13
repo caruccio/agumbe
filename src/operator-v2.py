@@ -98,15 +98,12 @@ class Agumbe(object):
                 f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
                 f'into {self.destNamespace}')
 
-    @kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
-    @kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
-    @kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
     def processObject(self):
 
         try:
             self.logger.info(
-                f'{self.event.upper()}: GlobalObject {self.srcNamespace}/{self.globalObjectName} of type "'
-                f'{self.srcObjType}" created')
+                f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/GlobalObject/{self.srcObjType}/{self.globalObjectName}" '
+                f'created')
 
             if srcObjType.lower() == "secret":
                 response = secret()
@@ -115,4 +112,12 @@ class Agumbe(object):
                 response = configMap()
 
         except Exception as e:
-            raise self.logger(f'Failed to fetch secret {secret}')
+            raise self.logger.error(
+                f'{self.event.upper()}: Failed to fetch "{self.srcNamespace}/GlobalObject/{self.srcObjType}/{self.globalObjectName}"')
+            
+    @kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
+    @kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
+    @kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
+    def test(event, body, spec, name, namespace, logger, **kwargs):
+        x = Agumbe(event, body, spec, name, namespace, logger)
+        x.processObject()
