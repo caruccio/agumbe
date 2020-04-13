@@ -115,9 +115,9 @@ class Agumbe(object):
             raise self.logger.error(
                 f'{self.event.upper()}: Failed to fetch "{self.srcNamespace}/GlobalObject/{self.srcObjType}/{self.globalObjectName}"')
             
-    @kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
-    @kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
-    @kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
+@kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
+@kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
+@kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
     def test(event, body, spec, name, namespace, logger, **kwargs):
         x = Agumbe(event, body, spec, name, namespace, logger)
         x.processObject()
