@@ -32,36 +32,36 @@ class Agumbe(object):
                                                             export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
 
-        try:
-            for namespace in self.destNamespaces:
-                objList = self.apiCore.list_namespaced_config_map(namespace=namespace)
+        for destNamespace in self.destNamespaces:
+            try:
+                objList = [ item.metadata.name for item in self.apiCore.list_namespaced_secret(namespace=destNamespace).items ]
                 objInList = True if self.destObjName in objList else False
 
                 if self.event == "create":
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
-                                                                         namespace=namespace, body=jsonSourceObj)
+                                                                         namespace=destNamespace, body=jsonSourceObj)
                     else:
-                        destObj = self.apiCore.create_namespaced_secret(namespace=namespace, body=jsonSourceObj)
+                        destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
 
                 elif self.event == "update":
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
-                                                                         namespace=namespace, body=jsonSourceObj)
+                                                                         namespace=destNamespace, body=jsonSourceObj)
                     else:
-                        destObj = self.apiCore.create_namespaced_secret(namespace=namespace, body=jsonSourceObj)
+                        destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
 
                 self.logger.info(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
                     f'{self.destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
 
-        except Exception as e:
-            self.logger.error(
-                f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
-                f'into {self.destNamespace}')
+            except Exception as e:
+                self.logger.error(
+                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
+                    f'into {self.destNamespaces}')
 
-    def configMap(self):
-
+    def configmap(self):
+        
         """
         Function to CRU ConfigMaps
         """
@@ -70,54 +70,58 @@ class Agumbe(object):
                                                                 export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
 
-        try:
-            for namespace in self.destNamespaces:
-                objList = self.apiCore.list_namespaced_config_map(namespace=namespace)
+        for destNamespace in self.destNamespaces:
+            try:
+                objList = [ item.metadata.name for item in self.apiCore.list_namespaced_config_map(namespace=destNamespace).items ]
                 objInList = True if self.destObjName in objList else False
 
                 if self.event == "create":
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
-                                                                             namespace=namespace, body=jsonSourceObj)
+                                                                             namespace=destNamespace, body=jsonSourceObj)
                     else:
-                        destObj = self.apiCore.create_namespaced_config_map(namespace=namespace, body=jsonSourceObj)
+                        destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
 
                 elif self.event == "update":
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
-                                                                             namespace=namespace, body=jsonSourceObj)
+                                                                             namespace=destNamespace, body=jsonSourceObj)
                     else:
-                        destObj = self.apiCore.create_namespaced_config_map(namespace=namespace, body=jsonSourceObj)
+                        destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
 
                 self.logger.info(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
                     f'{self.destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
 
-        except Exception as e:
-            self.logger.error(
-                f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
-                f'into {self.destNamespace}')
+            except Exception as e:
+                self.logger.error(
+                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
+                    f'into {self.destNamespace}')
 
     def processObject(self):
+        
+        """
+        Function to Process Object
+        """
 
         try:
             self.logger.info(
                 f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/GlobalObject/{self.srcObjType}/{self.globalObjectName}" '
                 f'created')
 
-            if srcObjType.lower() == "secret":
-                response = secret()
+            if self.srcObjType.lower() == "secret":
+                response = self.secret()
 
-            elif srcObjType.lower() == "configmap":
-                response = configMap()
+            elif self.srcObjType.lower() == "configmap":
+                response = self.configMap()
 
         except Exception as e:
             raise self.logger.error(
                 f'{self.event.upper()}: Failed to fetch "{self.srcNamespace}/GlobalObject/{self.srcObjType}/{self.globalObjectName}"')
-            
-@kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
-@kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
-@kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
-    def test(event, body, spec, name, namespace, logger, **kwargs):
-        x = Agumbe(event, body, spec, name, namespace, logger)
-        x.processObject()
+
+@kopf.on.resume('savilabs.io', 'v1alpha1', 'globalobjects')
+@kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
+@kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
+def globalObject(event, body, spec, name, namespace, logger, **kwargs):
+    x = Agumbe(event, body, spec, name, namespace, logger)
+    x.processObject()
