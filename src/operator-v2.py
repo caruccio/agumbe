@@ -22,16 +22,16 @@ class Agumbe(object):
         self.srcObjType = kwargs['spec']['type']
         self.srcObjName = kwargs['spec']['name']
         self.destObjName = kwargs['spec']['targetName'] if kwargs['spec'].get('targetName') else kwargs['spec']['name']
-        self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces'])
+        self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces']))
                                    
         try:
             listNamespaces = self.apiCore.list_namespace().items
             diffNamespaces = [destNamespace for destNamespace in destNamespaces if destNamespace not in listNamespaces]
             if diffNamespaces:
-                self.logger.error(
+                raise self.logger.error(
                     f'{self.event.upper()}: Failed to fetch namespaces "{diffNamespaces}"')
         except Exception as e:
-            self.logger.error(
+            raise self.logger.error(
                 f'{self.event.upper()}: Failed to fetch namespaces "{diffNamespaces}"')
         
     def secret(self):
