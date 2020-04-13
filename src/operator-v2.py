@@ -137,5 +137,5 @@ class Agumbe(object):
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, body, spec, name, namespace, logger, **kwargs):
     
-    go = Agumbe(event, body, spec, name, namespace, logger)
+    go = Agumbe(**locals())
     go.processObject()
