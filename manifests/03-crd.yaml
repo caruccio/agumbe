@@ -2,7 +2,7 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: globalobject.savilabs.io
+  name: globalobjects.savilabs.io
 spec:
   scope: Namespaced
   group: savilabs.io
