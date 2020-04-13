@@ -59,7 +59,6 @@ class Agumbe(object):
                     f'{destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
 
             except Exception as e:
-                print(e)
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
                     f'dupe '
@@ -127,7 +126,7 @@ class Agumbe(object):
                 response = self.configMap()
 
         except Exception as e:
-            raise self.logger.error(
+            self.logger.error(
                 f'{self.event.upper()}: Failed to fetch "{self.srcNamespace}/GlobalObject/{self.srcObjType}/'
                 f'{self.globalObjectName}"')
 
