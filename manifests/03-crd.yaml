@@ -29,13 +29,16 @@ spec:
       properties:
         spec:
           properties:
-            secretName:
+            type:
               type: string
-              description: "Name of the secret to replicate into namespaces"
-            targetSecretName:
+              description: "Type of the object"
+            name:
               type: string
-              description: "Name of the secret to be replicated"
+              description: "Name of the object to replicate into namespaces"
+            targetName:
+              type: string
+              description: "Name of the object in the target namespace(s)"
             targetNamespaces:
               type: array
-              description: "List of namespaces to which the secret has to be replicated"
-          required: ["secretName", "targetNamespaces"]
+              description: "Namespace(s) to which the object has to be replicated"
+          required: ["type", "name", "targetNamespaces"]
