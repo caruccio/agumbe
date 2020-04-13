@@ -20,10 +20,10 @@ class Agumbe(object):
         self.globalObjectName = name
 
         self.srcNamespace = namespace
-        self.srcObjType = spec['objectType']
-        self.srcObjName = spec['objectName']
+        self.srcObjType = spec['type']
+        self.srcObjName = spec['name']
 
-        self.destObjName = spec['targetObjectName'] if spec.get('targetObjectName') else spec['objectName']
+        self.destObjName = spec['targetName'] if spec.get('targetName') else spec['name']
         self.destNamespaces = spec['targetNamespaces']
 
     def secret(self):
