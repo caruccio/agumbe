@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import kopf
 from kubernetes import client
 
@@ -15,11 +17,9 @@ class Agumbe(object):
         self.logger = logger
 
         self.globalObjectName = name
-
         self.srcNamespace = namespace
         self.srcObjType = spec['type']
         self.srcObjName = spec['name']
-
         self.destObjName = spec['targetName'] if spec.get('targetName') else spec['name']
         self.destNamespaces = spec['targetNamespaces']
 
