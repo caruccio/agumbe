@@ -1,10 +1,6 @@
 import kopf
 from kubernetes import client
 
-
-@kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobject')
-@kopf.on.create('einstein.ai', 'v1alpha1', 'globalobject')
-@kopf.on.update('einstein.ai', 'v1alpha1', 'globalobject')
 class Agumbe(object):
     """
     API to duplicate objects
@@ -102,6 +98,9 @@ class Agumbe(object):
                 f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to dupe '
                 f'into {self.destNamespace}')
 
+    @kopf.on.resume('einstein.ai', 'v1alpha1', 'globalobjects')
+    @kopf.on.create('einstein.ai', 'v1alpha1', 'globalobjects')
+    @kopf.on.update('einstein.ai', 'v1alpha1', 'globalobjects')
     def processObject(self):
 
         try:
