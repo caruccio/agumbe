@@ -1,8 +1,8 @@
 import kopf
 from kubernetes import client
 
-
 class Agumbe(object):
+    
     """
     API to duplicate objects
     """
@@ -17,11 +17,11 @@ class Agumbe(object):
         self.globalObjectName = name
 
         self.srcNamespace = namespace
-        self.srcObjType = spec.type
-        self.srcObjName = spec.name
+        self.srcObjType = spec['type']
+        self.srcObjName = spec['name']
 
-        self.destObjName = spec.targetName if spec.get('targetName') else spec.name
-        self.destNamespaces = spec.targetNamespaces
+        self.destObjName = spec['targetName'] if spec.get('targetName') else spec['name']
+        self.destNamespaces = spec['targetNamespaces']
 
     def secret(self):
 
@@ -32,22 +32,22 @@ class Agumbe(object):
         readSourceObj = self.apiCore.read_namespaced_secret(name=self.srcObjName, namespace=self.srcNamespace,
                                                             export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
-        jsonSourceObj.metadata.name = self.destObjName
+        jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
             try:
-                objList = [item.metadata.name for item in
+                objList = [item['metadata']['name'] for item in
                            self.apiCore.list_namespaced_secret(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
-                if self.event in ["create", "resume"]:
+                if self.event in ['create', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
                                                                          namespace=destNamespace, body=jsonSourceObj)
                     else:
                         destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
 
-                elif self.event in ["update", "resume"]:
+                elif self.event in ['update', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
                                                                          namespace=destNamespace, body=jsonSourceObj)
@@ -74,15 +74,15 @@ class Agumbe(object):
         readSourceObj = self.apiCore.read_namespaced_config_map(name=self.srcObjName, namespace=self.srcNamespace,
                                                                 export=True)
         jsonSourceObj = self.apiApi.sanitize_for_serialization(readSourceObj)
-        jsonSourceObj.metadata.name = self.destObjName
+        jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
             try:
-                objList = [item.metadata.name for item in
+                objList = [item['metadata']['name'] for item in
                            self.apiCore.list_namespaced_config_map(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
-                if self.event in ["create", "resume"]:
+                if self.event in ['create', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
                                                                              namespace=destNamespace,
@@ -90,7 +90,7 @@ class Agumbe(object):
                     else:
                         destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
 
-                elif self.event in ["update", "resume"]:
+                elif self.event in ['update', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
                                                                              namespace=destNamespace,
@@ -120,10 +120,10 @@ class Agumbe(object):
                 f'{self.globalObjectName}" '
                 f'created')
 
-            if self.srcObjType.lower() == "secret":
+            if self.srcObjType.lower() == 'secret':
                 response = self.secret()
 
-            elif self.srcObjType.lower() == "configmap":
+            elif self.srcObjType.lower() == 'configmap':
                 response = self.configMap()
 
         except Exception as e:
@@ -136,5 +136,5 @@ class Agumbe(object):
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, body, spec, name, namespace, logger, **kwargs):
-    x = Agumbe(event, body, spec, name, namespace, logger)
-    x.processObject()
+    go = Agumbe(event, body, spec, name, namespace, logger)
+    go.processObject()
