@@ -14,7 +14,7 @@ spec:
       labels:
         operator: agumbe
     spec:
-      serviceAccountName: secrets-operator
+      serviceAccountName: agumbe
       containers:
       - name: agumbe
         image: savvythru/agumbe
