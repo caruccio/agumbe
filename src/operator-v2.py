@@ -140,6 +140,9 @@ class Agumbe(object):
 
             elif self.srcObjType.lower() == 'configmap':
                 response = self.configMap()
+                
+            else:
+                self.logger.error(f'{self.event.upper()}: Object type "{self.srcObjType}" not supported')
 
         except ApiException as e:
             self.logger.error(f'{self.event.upper()}: {e}')
