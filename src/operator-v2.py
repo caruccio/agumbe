@@ -151,14 +151,15 @@ class Agumbe(object):
 
         except ApiException as e:
             self.logger.error(f'{self.event.upper()}: {e}')
-            self.logger.error(
-                f'{self.event.upper()}: Failed to fetch GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
-                f'{self.globalObjectName}"')
 
-            
+
 @kopf.on.resume('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, spec, name, namespace, logger, **kwargs):
-    go = Agumbe(**locals())
-    go.processObject()
+    try:
+        go = Agumbe(**locals())
+        go.processObject()
+    except Exception as e:
+        self.logger.error(
+            f'{event.upper()}: Failed to fetch GlobalObject "{namespace}/{name}"')
