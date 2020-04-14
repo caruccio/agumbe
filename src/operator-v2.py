@@ -48,10 +48,6 @@ class Agumbe(object):
         jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
-            if destNamespace not in self.listNamespaces:
-                self.logger.error(
-                    f'{self.event.upper()}: Failed to find namespace {destNamespace}')
-                continue
             try:
                 objList = [item.metadata.name for item in
                            self.apiCore.list_namespaced_secret(namespace=destNamespace).items]
@@ -94,10 +90,6 @@ class Agumbe(object):
         jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
-            if destNamespace not in self.listNamespaces:
-                self.logger.error(
-                    f'{self.event.upper()}: Failed to find namespace {destNamespace}')
-                continue
             try:
                 objList = [item.metadata.name for item in
                            self.apiCore.list_namespaced_config_map(namespace=destNamespace).items]
@@ -143,9 +135,10 @@ class Agumbe(object):
                 f'created')
             
             diffList = [destNamespace for destNamespace in self.destNamespaces if destNamespace not in self.listNamespaces]
-            self.logger.error(
+            if diffList:
+                self.logger.error(
                     f'{self.event.upper()}: Failed to find namespaces {diffList}')
-            return
+                return
 
             if self.srcObjType.lower() == 'secret':
                 response = self.secret()
@@ -162,7 +155,7 @@ class Agumbe(object):
                 f'{self.event.upper()}: Failed to fetch GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}"')
 
-
+            
 @kopf.on.resume('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
