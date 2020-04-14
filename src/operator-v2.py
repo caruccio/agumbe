@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import sys
-
 import kopf
 from kubernetes import client
 
