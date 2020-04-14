@@ -3,10 +3,17 @@
 import kopf
 from kubernetes import client
 
-
 class Agumbe(object):
+    
     """
     API to duplicate objects
+
+    Attributes:
+        event: Action on the GlobalObject (CRUD)
+        spec: Specification of the GlobalObject
+        name: Name of the GlobalObject
+        namespace: Namespace in which the GlobalObject resides
+        logger: Logger object
     """
 
     def __init__(self, **kwargs):
@@ -154,6 +161,6 @@ class Agumbe(object):
 @kopf.on.resume('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
-def globalObject(event, body, spec, name, namespace, logger, **kwargs):
+def globalObject(event, spec, name, namespace, logger, **kwargs):
     go = Agumbe(**locals())
     go.processObject()
