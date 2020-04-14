@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 
-import kopf, sys
+import sys
+
+import kopf
 from kubernetes import client
 
+
 class Agumbe(object):
-    
     """
     API to duplicate objects
     """
 
     def __init__(self, **kwargs):
-        
+
         self.apiCore = client.CoreV1Api()
         self.apiApi = client.ApiClient()
 
@@ -23,12 +25,12 @@ class Agumbe(object):
         self.srcObjName = kwargs['spec']['name']
         self.destObjName = kwargs['spec']['targetName'] if kwargs['spec'].get('targetName') else kwargs['spec']['name']
         self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces']))
-                                   
+
         try:
             self.listNamespaces = [item.metadata.name for item in self.apiCore.list_namespace().items]
         except ApiException as e:
-            self.logger.error(f'{e}')
-        
+            self.logger.error(f'{self.event.upper()}: {e}')
+
     def secret(self):
 
         """
@@ -43,7 +45,7 @@ class Agumbe(object):
         for destNamespace in self.destNamespaces:
             if destNamespace not in self.listNamespaces:
                 self.logger.error(
-                    f'{self.event.upper()}: Failed to find namespaces {destNamespace}')
+                    f'{self.event.upper()}: Failed to find namespace {destNamespace}')
                 continue
             try:
                 objList = [item.metadata.name for item in
@@ -69,6 +71,7 @@ class Agumbe(object):
                     f'{destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
 
             except ApiException as e:
+                self.logger.error(f'{self.event.upper()}: {e}')
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
                     f'dupe '
@@ -88,7 +91,7 @@ class Agumbe(object):
         for destNamespace in self.destNamespaces:
             if destNamespace not in self.listNamespaces:
                 self.logger.error(
-                    f'{self.event.upper()}: Failed to find namespaces {destNamespace}')
+                    f'{self.event.upper()}: Failed to find namespace {destNamespace}')
                 continue
             try:
                 objList = [item.metadata.name for item in
@@ -116,6 +119,7 @@ class Agumbe(object):
                     f'{self.Namespace}/{self.srcObjType}/{destObj.metadata.name}')
 
             except ApiException as e:
+                self.logger.error(f'{self.event.upper()}: {e}')
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
                     f'dupe '
@@ -140,6 +144,7 @@ class Agumbe(object):
                 response = self.configMap()
 
         except ApiException as e:
+            self.logger.error(f'{self.event.upper()}: {e}')
             self.logger.error(
                 f'{self.event.upper()}: Failed to fetch GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}"')
@@ -149,6 +154,5 @@ class Agumbe(object):
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, body, spec, name, namespace, logger, **kwargs):
-    
     go = Agumbe(**locals())
     go.processObject()
