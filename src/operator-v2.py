@@ -2,6 +2,7 @@
 
 import kopf
 from kubernetes import client
+from kubernetes.client.rest import ApiException
 
 class Agumbe(object):
     
@@ -133,8 +134,9 @@ class Agumbe(object):
                 f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}" '
                 f'created')
-            
-            diffList = [destNamespace for destNamespace in self.destNamespaces if destNamespace not in self.listNamespaces]
+
+            diffList = [destNamespace for destNamespace in self.destNamespaces if
+                        destNamespace not in self.listNamespaces]
             if diffList:
                 self.logger.error(
                     f'{self.event.upper()}: Failed to find namespaces {diffList}')
@@ -145,7 +147,7 @@ class Agumbe(object):
 
             elif self.srcObjType.lower() == 'configmap':
                 response = self.configMap()
-                
+
             else:
                 self.logger.error(f'{self.event.upper()}: Object type "{self.srcObjType}" not supported')
 
