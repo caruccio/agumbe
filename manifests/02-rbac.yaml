@@ -12,7 +12,7 @@ metadata:
   name: agumbe
 rules:
 - apiGroups: [""]
-  resources: ["secrets", "configmaps"]
+  resources: ["secrets", "configmaps", "namespaces"]
   verbs: ["get", "create", "update", "list"]
 - apiGroups: ["savilabs.io"]
   resources: ["globalobjects"]
