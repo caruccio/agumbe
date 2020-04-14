@@ -65,13 +65,13 @@ class Agumbe(object):
                         destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
 
                 self.logger.info(
-                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
-                    f'{destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
+                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
+                    f'"{destNamespace}/{destObj.metadata.name}"')
 
             except ApiException as e:
                 self.logger.error(f'{self.event.upper()}: {e}')
                 self.logger.error(
-                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
+                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName} failed to '
                     f'dupe '
                     f'into {destNamespace}')
 
@@ -113,13 +113,13 @@ class Agumbe(object):
                         destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
 
                 self.logger.info(
-                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
-                    f'{self.Namespace}/{self.srcObjType}/{destObj.metadata.name}')
+                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
+                    f'"{destNamespace}/{destObj.metadata.name}"')
 
             except ApiException as e:
                 self.logger.error(f'{self.event.upper()}: {e}')
                 self.logger.error(
-                    f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
+                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName} failed to '
                     f'dupe '
                     f'into {destNamespace}')
 
@@ -131,7 +131,7 @@ class Agumbe(object):
 
         try:
             self.logger.info(
-                f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/GlobalObject/{self.srcObjType}/'
+                f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}" '
                 f'created')
 
