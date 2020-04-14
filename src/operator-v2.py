@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import kopf
+import kopf, sys
 from kubernetes import client
 
 class Agumbe(object):
@@ -25,14 +25,9 @@ class Agumbe(object):
         self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces']))
                                    
         try:
-            listNamespaces = self.apiCore.list_namespace().items
-            diffNamespaces = [destNamespace for destNamespace in destNamespaces if destNamespace not in listNamespaces]
-            if diffNamespaces:
-                raise self.logger.error(
-                    f'{self.event.upper()}: Failed to fetch namespaces "{diffNamespaces}"')
-        except Exception as e:
-            raise self.logger.error(
-                f'{self.event.upper()}: Failed to fetch namespaces "{diffNamespaces}"')
+            self.listNamespaces = [item.metadata.name for item in self.apiCore.list_namespace().items]
+        except ApiException as e:
+            self.logger.error(f'{e}')
         
     def secret(self):
 
@@ -46,8 +41,12 @@ class Agumbe(object):
         jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
+            if destNamespace not in self.listNamespaces:
+                self.logger.error(
+                    f'{self.event.upper()}: Failed to find namespaces {destNamespace}')
+                continue
             try:
-                objList = [item['metadata']['name'] for item in
+                objList = [item.metadata.name for item in
                            self.apiCore.list_namespaced_secret(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
@@ -69,7 +68,7 @@ class Agumbe(object):
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
                     f'{destNamespace}/{self.srcObjType}/{destObj.metadata.name}')
 
-            except Exception as e:
+            except ApiException as e:
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
                     f'dupe '
@@ -87,8 +86,12 @@ class Agumbe(object):
         jsonSourceObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
+            if destNamespace not in self.listNamespaces:
+                self.logger.error(
+                    f'{self.event.upper()}: Failed to find namespaces {destNamespace}')
+                continue
             try:
-                objList = [item['metadata']['name'] for item in
+                objList = [item.metadata.name for item in
                            self.apiCore.list_namespaced_config_map(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
@@ -112,7 +115,7 @@ class Agumbe(object):
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} duped to '
                     f'{self.Namespace}/{self.srcObjType}/{destObj.metadata.name}')
 
-            except Exception as e:
+            except ApiException as e:
                 self.logger.error(
                     f'{self.event.upper()}: Secret {self.srcNamespace}/{self.srcObjType}/{self.srcObjName} failed to '
                     f'dupe '
@@ -136,9 +139,9 @@ class Agumbe(object):
             elif self.srcObjType.lower() == 'configmap':
                 response = self.configMap()
 
-        except Exception as e:
+        except ApiException as e:
             self.logger.error(
-                f'{self.event.upper()}: Failed to fetch "{self.srcNamespace}/GlobalObject/{self.srcObjType}/'
+                f'{self.event.upper()}: Failed to fetch GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}"')
 
 
