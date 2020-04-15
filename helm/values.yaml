@@ -1,0 +1,8 @@
+---
+replicas: 1
+
+app:
+  name: agumbe
+  namespace: agumbe
+  image: savvythru/agumbe
+  tag: v1.0

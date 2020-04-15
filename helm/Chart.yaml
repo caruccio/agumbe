@@ -1,0 +1,8 @@
+---
+apiVersion: v2
+name: agumbe
+version: v1.0
+description: A Helm chart to deploy Agumbe GlobalObject controller
+home: https://github.com/savithruml/agumbe
+sources:
+- https://github.com/savithruml/agumbe

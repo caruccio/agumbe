@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      operator: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        operator: {{ .Values.app.name }}
+    spec:
+      priorityClassName: system-cluster-critical
+      serviceAccountName: {{ .Values.app.name }}
+      containers:
+      - name: {{ .Values.app.name }}
+        image: "{{ .Values.app.image }}:{{ .Values.app.tag }}"
+        imagePullPolicy: Always
