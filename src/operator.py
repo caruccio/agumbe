@@ -54,23 +54,16 @@ class Agumbe(object):
                            self.apiCore.list_namespaced_secret(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
-                if self.event in ['create', 'resume']:
+                if self.event in ['create', 'update', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
                                                                          namespace=destNamespace, body=jsonSourceObj)
                     else:
                         destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
 
-                elif self.event in ['update', 'resume']:
-                    if objInList:
-                        destObj = self.apiCore.replace_namespaced_secret(name=self.destObjName,
-                                                                         namespace=destNamespace, body=jsonSourceObj)
-                    else:
-                        destObj = self.apiCore.create_namespaced_secret(namespace=destNamespace, body=jsonSourceObj)
-
-                self.logger.info(
-                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
-                    f'"{destNamespace}/{destObj.metadata.name}"')
+                    self.logger.info(
+                        f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
+                        f'"{destNamespace}/{destObj.metadata.name}"')
 
             except ApiException as e:
                 self.logger.error(f'{self.event.upper()}: {e}')
@@ -96,7 +89,7 @@ class Agumbe(object):
                            self.apiCore.list_namespaced_config_map(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
-                if self.event in ['create', 'resume']:
+                if self.event in ['create', 'update', 'resume']:
                     if objInList:
                         destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
                                                                              namespace=destNamespace,
@@ -104,17 +97,9 @@ class Agumbe(object):
                     else:
                         destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
 
-                elif self.event in ['update', 'resume']:
-                    if objInList:
-                        destObj = self.apiCore.replace_namespaced_config_map(name=self.destObjName,
-                                                                             namespace=destNamespace,
-                                                                             body=jsonSourceObj)
-                    else:
-                        destObj = self.apiCore.create_namespaced_config_map(namespace=destNamespace, body=jsonSourceObj)
-
-                self.logger.info(
-                    f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
-                    f'"{destNamespace}/{destObj.metadata.name}"')
+                    self.logger.info(
+                        f'{self.event.upper()}: {self.srcObjType} "{self.srcNamespace}/{self.srcObjName}" duped to '
+                        f'"{destNamespace}/{destObj.metadata.name}"')
 
             except ApiException as e:
                 self.logger.error(f'{self.event.upper()}: {e}')
