@@ -15,4 +15,4 @@ rules:
     verbs: ["get", "list", "watch", "put", "post", "patch"]
   - apiGroups: ["events.k8s.io", ""]
     resources: ["events"]
-  verbs: ["create"]
+    verbs: ["create"]
