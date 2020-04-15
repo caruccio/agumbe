@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-april-2020
+  namespace: agumbe
+data:
+  hello: world
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-may-2020
+  namespace: agumbe
+data:
+  world: hello

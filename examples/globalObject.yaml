@@ -2,12 +2,12 @@
 apiVersion: savilabs.io/v1alpha1
 kind: GlobalObject
 metadata:
-  name: test-global-secret
-  namespace: admin
+  name: global-configmap
+  namespace: agumbe
 spec:
-  type: Secret
-  name: test-secret-mar-18-2020
-  targetName: my-secret
+  type: ConfigMap
+  name: cm-april-2020
+  targetName: my-configmap
   targetNamespaces:
     - red
     - blue
