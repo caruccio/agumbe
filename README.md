@@ -32,7 +32,10 @@ To install in your cluster
     type: <Required: CAN-BE-ONE-OFF-["Secret", "ConfigMap"]>
     name: <Required: NAME-OF-SOURCE-OBJECT-CREATED-IN-STEP2>
     targetName: <Optional: NAME-OF-THE-REPLICATED-OBJECT>
-    targetNamespaces: <Required: <LIST-OF-TARGET-NAMESPACES>
+    targetNamespaces: <Optional: <LIST-OF-TARGET-NAMESPACES>
+    matchLabels:
+    - key: <Optional: NAMESPACE-LABEL-KEY>
+      value: <Optional: NAMESPACE-LABEL-VALUE>
 ```
 4. Create the global object
 ```

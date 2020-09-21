@@ -39,7 +39,7 @@ spec:
             type:
               type: string
               description: "Type of the object to replicate into namespace(s)"
-              enum: ["secret", "configmap"]
+              enum: ["Secret", "ConfigMap"]
             name:
               type: string
               description: "Name of the object to replicate into namespace(s)"
@@ -49,4 +49,7 @@ spec:
             targetNamespaces:
               type: array
               description: "Namespace(s) to which the object has to be replicated"
-          required: ["type", "name", "targetNamespaces"]
+            matchLabels:
+              type: array
+              description: "Namespace(s) labels to match"
+          required: ["type", "name"]

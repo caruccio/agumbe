@@ -30,7 +30,8 @@ class Agumbe(object):
         self.srcObjType = kwargs['spec']['type']
         self.srcObjName = kwargs['spec']['name']
         self.destObjName = kwargs['spec']['targetName'] if kwargs['spec'].get('targetName') else kwargs['spec']['name']
-        self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces']))
+        self.destNamespaces = list(dict.fromkeys(kwargs['spec']['targetNamespaces'])) if kwargs['spec'].get('targetNamespaces') else []
+        self.namespaceLabels = kwargs['spec']['matchLabels'] if kwargs['spec'].get('matchLabels') else None
 
         try:
             self.listNamespaces = [item.metadata.name for item in self.apiCore.list_namespace().items]
@@ -119,7 +120,22 @@ class Agumbe(object):
                 f'{self.event.upper()}: GlobalObject "{self.srcNamespace}/{self.srcObjType}/'
                 f'{self.globalObjectName}" '
                 f'created')
-
+            
+            if self.namespaceLabels:
+                for label in self.namespaceLabels:
+                    labelFilter = '{}={}'.format(label['key'], label['value'])
+                    matchNamespaces = [item.metadata.name for item in self.apiCore.list_namespace(label_selector=labelFilter).items]
+                    if not matchNamespaces:
+                        self.logger.error(
+                            f'{self.event.upper()}: Failed to find namespaces with label "{labelFilter}"')
+                        continue
+                    else:
+                        self.logger.info(
+                            f'{self.event.upper()}: Namespaces {matchNamespaces} matched for label "{labelFilter}"')
+                    self.destNamespaces += list(set(matchNamespaces))
+            
+            self.destNamespaces = list(dict.fromkeys(self.destNamespaces))
+           
             diffList = [destNamespace for destNamespace in self.destNamespaces if
                         destNamespace not in self.listNamespaces]
             if diffList:
@@ -140,7 +156,6 @@ class Agumbe(object):
             self.logger.error(f'{self.event.upper()}: {e}')
 
 
-@kopf.on.resume('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, spec, name, namespace, logger, **kwargs):
@@ -148,5 +163,5 @@ def globalObject(event, spec, name, namespace, logger, **kwargs):
         go = Agumbe(**locals())
         go.processObject()
     except Exception as e:
-        self.logger.error(
-            f'{event.upper()}: Failed to fetch GlobalObject "{namespace}/{name}"')
+        logger.error(
+            f'{event.upper()}: {e}')
