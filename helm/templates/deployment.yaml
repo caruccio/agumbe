@@ -14,7 +14,6 @@ spec:
       labels:
         operator: {{ .Values.app.name }}
     spec:
-      priorityClassName: system-cluster-critical
       serviceAccountName: {{ .Values.app.name }}
       containers:
       - name: {{ .Values.app.name }}
