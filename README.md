@@ -47,16 +47,18 @@ To install in your cluster
 ```
 5. Verify that the object is replicated in target namespaces
 ```
-  $ kubectl get configmaps --all-namespaces
+  $ kubectl get configmap cm-april-2020 -o json -n $namespace | jq -r ".data"
 
-  $ kubectl get configmap my-configmap -o yaml -n red
+  $ for namespace in red blue green yellow orange; do kubectl get configmap my-configmap -o json -n $namespace | jq -r ".data"; done
 ```
-6. Replace `spec.name` in STEP3 to point to the second configMap (cm-may-2020) & rerun STEP4
+6. Replace `spec.name` in **STEP3** to point to the second configMap `cm-may-2020` & rerun **STEP4**
 ```
   $ kubectl apply -f examples/globalObject.yaml
 ```
 7. Observe that the value of the configMap in the target namespaces have been modified
 ```
+  $ kubectl get configmap cm-may-2020 -o json -n $namespace | jq -r ".data"
+  
   $ for namespace in red blue green yellow orange; do kubectl get configmap my-configmap -o json -n $namespace | jq -r ".data"; done
 ```
 8. Observe replication logs on the controller
