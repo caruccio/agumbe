@@ -47,7 +47,7 @@ To install in your cluster
 ```
 5. Verify that the object is replicated in target namespaces
 ```
-  $ kubectl get configmap cm-april-2020 -o json -n $namespace | jq -r ".data"
+  $ kubectl get configmap cm-april-2020 -o json -n agumbe | jq -r ".data"
 
   $ for namespace in red blue green yellow orange; do kubectl get configmap my-configmap -o json -n $namespace | jq -r ".data"; done
 ```
@@ -57,7 +57,7 @@ To install in your cluster
 ```
 7. Observe that the value of the configMap in the target namespaces have been modified
 ```
-  $ kubectl get configmap cm-may-2020 -o json -n $namespace | jq -r ".data"
+  $ kubectl get configmap cm-may-2020 -o json -n agumbe | jq -r ".data"
   
   $ for namespace in red blue green yellow orange; do kubectl get configmap my-configmap -o json -n $namespace | jq -r ".data"; done
 ```
