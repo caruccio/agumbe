@@ -8,6 +8,9 @@ spec:
   type: ConfigMap
   name: cm-april-2020
   targetName: my-configmap
+  matchLabels:
+    - key: infra.savilabs.io/owner
+      value: owner
   targetNamespaces:
     - red
     - blue
