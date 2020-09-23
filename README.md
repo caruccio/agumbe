@@ -63,5 +63,5 @@ To install in your cluster
 ```
 8. Observe replication logs on the controller
 ```
-  $ kubectl logs agumbe -n agumbe -f
+  $ kubectl logs deploy/agumbe -n agumbe -f
 ```
