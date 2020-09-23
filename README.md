@@ -67,7 +67,7 @@ To install in your cluster
 ```
 
 ## Contributing
-If you wish to contribute or make a feature request, please raise a PR or an issue!
+If you wish to contribute or make a feature request, please raise a [pull request](https://github.com/savithruml/agumbe/pulls) or an [issue](https://github.com/savithruml/agumbe/issues/new/choose).
 
 ## Contact
 Savithru Lokanath (savithru at colorado dot edu)
