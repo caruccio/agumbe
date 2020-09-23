@@ -10,7 +10,7 @@ spec:
   targetName: my-configmap
   matchLabels:
     - key: infra.savilabs.io/owner
-      value: owner
+      value: admin
   targetNamespaces:
     - red
     - blue
