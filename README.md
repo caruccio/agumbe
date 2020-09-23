@@ -6,13 +6,17 @@ To install in your cluster
 ```
   $ kubectl create namespace agumbe
 
-  $ helm install --name agumbe helm --namespace agumbe
+  $ helm install agumbe helm --namespace agumbe
 ```
 
 ### Example
 1. Create target namespaces to which the object has to be replicated
 ```
-  $ for namespace in {"red","blue", "green"}; do kubectl create ns $namespace; done
+  $ for namespace in red blue green; do kubectl create ns $namespace; done
+```
+2. Create a few namespaces with labels on them
+```
+  $ for namespace in yellow orange; do kubectl create ns $namespace && kubectl label ns $namespace infra.savilabs.io/owner=admin; done
 ```
 2. Create the source object that needs to be replicated
 ```
@@ -53,7 +57,7 @@ To install in your cluster
 ```
 7. Observe that the value of the configMap in the target namespaces have been modified
 ```
-  $ kubectl get configmap my-configmap -o yaml -n red
+  $ for namespace in red blue green yellow orange; do kubectl get configmap my-configmap -o json -n $namespace | jq -r ".data"; done
 ```
 8. Observe replication logs on the controller
 ```
