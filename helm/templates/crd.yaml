@@ -39,7 +39,7 @@ spec:
             type:
               type: string
               description: "Type of the object to replicate into namespace(s)"
-              enum: ["Secret", "ConfigMap"]
+              enum: ["Secret", "ConfigMap", "Deployment"]
             name:
               type: string
               description: "Name of the object to replicate into namespace(s)"

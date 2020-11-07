@@ -1,0 +1,26 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    operator: {{ .Values.app.name }}
+data:
+  resources.yaml: |-
+    ---
+    core:
+    - name: namespace
+      api: CoreV1Api
+    - name: sanitize
+      api: ApiClient
+    scoped:
+    - name: secret
+      api: CoreV1Api
+      convention: secret
+    - name: configmap
+      api: CoreV1Api
+      convention: config_map
+    - name: deployment
+      api: AppsV1Api
+      convention: deployment
