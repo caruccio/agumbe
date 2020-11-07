@@ -19,3 +19,16 @@ spec:
       - name: {{ .Values.app.name }}
         image: "{{ .Values.app.image }}:{{ .Values.app.tag }}"
         imagePullPolicy: Always
+        env:
+        - name: BUILD_TIMESTAMP
+          value: {{ now | quote }}
+        volumeMounts:
+        - mountPath: /src/agumbe/conf
+          name: agumbe-conf
+      volumes:
+      - name: agumbe-conf
+        configMap:
+          name: agumbe
+          items:
+          - key: resources.yaml
+            path: resources.yaml

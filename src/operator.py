@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+from itertools import chain
+from time import time
+
 import kopf
-from kubernetes import client
+import yaml
+from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
 
@@ -19,19 +23,7 @@ class Agumbe(object):
 
     def __init__(self, **kwargs):
 
-        self.apiMap = {
-            'secret': 'secret',
-            'configmap': 'config_map',
-            'deployment': 'deployment'
-        }
-
-        self.apiType = {
-            'secret': client.CoreV1Api(),
-            'configmap': client.CoreV1Api(),
-            'deployment': client.AppsV1Api(),
-            'namespace': client.CoreV1Api(),
-            'sanitize': client.ApiClient()
-        }
+        self.apiMap = kwargs['apiMap']
 
         self.event = kwargs['event']
         self.logger = kwargs['logger']
@@ -46,19 +38,19 @@ class Agumbe(object):
         self.namespaceLabels = kwargs['spec']['matchLabels'] if kwargs['spec'].get('matchLabels') else None
 
         try:
-            self.listNamespaces = [item.metadata.name for item in self.apiType['namespace'].list_namespace().items]
+            self.listNamespaces = [item.metadata.name for item in
+                                   self.apiMap['namespace']['client'].list_namespace().items]
         except ApiException as e:
             self.logger.error(f'{self.event.upper()}: {e}')
 
-    def replicate(self):
-
+    def __replicate(self):
         """
         Function to CRU objects
         """
 
-        readObj = self.readObj(name=self.srcObjName, namespace=self.srcNamespace,
-                               export=True)
-        jsonObj = self.apiType['sanitize'].sanitize_for_serialization(readObj)
+        sourceObj = self.readObj(name=self.srcObjName, namespace=self.srcNamespace,
+                                 export=True)
+        jsonObj = self.apiMap['sanitize']['client'].sanitize_for_serialization(sourceObj)
         jsonObj['metadata']['name'] = self.destObjName
 
         for destNamespace in self.destNamespaces:
@@ -67,7 +59,7 @@ class Agumbe(object):
                            self.listObj(namespace=destNamespace).items]
                 objInList = True if self.destObjName in objList else False
 
-                if self.event in ['create', 'update', 'resume']:
+                if self.event in ['create', 'update']:
                     if objInList:
                         destObj = self.replaceObj(name=self.destObjName,
                                                   namespace=destNamespace, body=jsonObj)
@@ -86,7 +78,6 @@ class Agumbe(object):
                     f'into {destNamespace}')
 
     def processObject(self):
-
         """
         Function to Process Object
         """
@@ -99,9 +90,10 @@ class Agumbe(object):
 
             if self.namespaceLabels:
                 for label in self.namespaceLabels:
-                    labelFilter = '{}={}'.format(label['key'], label['value'])
+                    labelFilter = f'{label["key"]}={label["value"]}'
                     matchNamespaces = [item.metadata.name for item in
-                                       self.apiType['namespace'].list_namespace(label_selector=labelFilter).items]
+                                       self.apiMap['namespace']['client'].list_namespace(
+                                           label_selector=labelFilter).items]
                     if not matchNamespaces:
                         self.logger.error(
                             f'{self.event.upper()}: Failed to find namespaces with label "{labelFilter}"')
@@ -120,16 +112,18 @@ class Agumbe(object):
                     f'{self.event.upper()}: Failed to find namespaces {diffList}')
                 return
 
-            if self.srcObjType.lower() in self.apiMap:
-                self.readObj = getattr(self.apiType[self.srcObjType.lower()],
-                                       f'read_namespaced_{self.apiMap[self.srcObjType.lower()]}')
-                self.listObj = getattr(self.apiType[self.srcObjType.lower()],
-                                       f'list_namespaced_{self.apiMap[self.srcObjType.lower()]}')
-                self.createObj = getattr(self.apiType[self.srcObjType.lower()],
-                                         f'create_namespaced_{self.apiMap[self.srcObjType.lower()]}')
-                self.replaceObj = getattr(self.apiType[self.srcObjType.lower()],
-                                          f'replace_namespaced_{self.apiMap[self.srcObjType.lower()]}')
-                self.replicate()
+            lowerSrcObjType = self.srcObjType.lower()
+
+            if lowerSrcObjType in self.apiMap:
+                self.readObj = getattr(self.apiMap[lowerSrcObjType]['client'],
+                                       f'read_namespaced_{self.apiMap[lowerSrcObjType]["convention"]}')
+                self.listObj = getattr(self.apiMap[lowerSrcObjType]['client'],
+                                       f'list_namespaced_{self.apiMap[lowerSrcObjType]["convention"]}')
+                self.createObj = getattr(self.apiMap[lowerSrcObjType]['client'],
+                                         f'create_namespaced_{self.apiMap[lowerSrcObjType]["convention"]}')
+                self.replaceObj = getattr(self.apiMap[lowerSrcObjType]['client'],
+                                          f'replace_namespaced_{self.apiMap[lowerSrcObjType]["convention"]}')
+                self.__replicate()
             else:
                 self.logger.error(f'{self.event.upper()}: Object type "{self.srcObjType}" not supported')
 
@@ -140,10 +134,42 @@ class Agumbe(object):
 @kopf.on.create('savilabs.io', 'v1alpha1', 'globalobjects')
 @kopf.on.update('savilabs.io', 'v1alpha1', 'globalobjects')
 def globalObject(event, spec, name, namespace, logger, **kwargs):
+    """
+        Create object on event
+    """
+
     try:
+        apiMap = globalMap
         go = Agumbe(**locals())
+        start = time()
         go.processObject()
+        end = time()
+        logger.info(f'{event.upper()}: Execution time: {end - start} seconds')
     except Exception as e:
         logger.error(
             f'{event.upper()}: {e}')
-        
+
+
+def main():
+    """
+        Load config from file
+    """
+
+    config.load_incluster_config()
+
+    global globalMap
+    globalMap = dict()
+
+    with open("conf/resources.yaml", 'r') as stream:
+        try:
+            conf = yaml.safe_load(stream)
+        except yaml.YAMLError as e:
+            print(e)
+
+    for item in chain(conf['core'], conf['scoped']):
+        apiObj = getattr(client, item['api'])()
+        objConvention = item['convention'] if item.get('convention') else item['name']
+        globalMap[item['name']] = {'client': apiObj, 'convention': objConvention}
+
+
+main()
