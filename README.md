@@ -1,5 +1,5 @@
 # Project Agumbe
-A Kubernetes replication controller to clone objects. [Blog](https://medium.com/@savvythrough/agumbe-a-kubernetes-operator-to-create-globalsecrets-f73c19103141?source=friends_link&sk=ea432e64dba40cecbe17618e58e4c656) post explains the concept & the problem it's trying to solve.
+A Kubernetes replication controller to clone objects. [Blog](https://engineering.salesforce.com/project-agumbe-share-objects-across-namespaces-in-kubernetes-1fc2e1ddb3eb) post explains the concept & the problem it's trying to solve.
 
 ### Install
 To install in your cluster
